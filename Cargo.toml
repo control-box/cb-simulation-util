@@ -1,0 +1,11 @@
+[package]
+name = "control-box"
+version = "0.1.0"
+edition = "2024"
+
+[features]
+std = []
+
+[dependencies]
+num-traits = "0.2.19"
+
