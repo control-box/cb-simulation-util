@@ -5,6 +5,7 @@ extern crate std;
 
 pub mod hysteresis;
 pub mod pt1;
+pub mod signal;
 
 use core::fmt;
 
@@ -16,6 +17,6 @@ impl fmt::Display for NotDefinedError {
     }
 }
 
-trait TransferFunction<T> {
+pub trait TransferFunction<T> {
     fn transfer(&mut self, u: T) -> Result<T, NotDefinedError>;
 }

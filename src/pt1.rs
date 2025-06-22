@@ -14,7 +14,7 @@ pub struct PT1<N> {
 }
 
 const FIX_KOMMA_SHIFT_BITS: u8 = 10;
-const FIX_KOMMA_SHIFT: i32 =  1 << FIX_KOMMA_SHIFT_BITS;
+const FIX_KOMMA_SHIFT: i32 = 1 << FIX_KOMMA_SHIFT_BITS;
 
 impl PT1<i32> {
     ///
@@ -30,8 +30,8 @@ impl PT1<i32> {
         }
     }
     pub fn transfer(&mut self, input: i32) -> i32 {
-        let out = self.previous_output
-            + (self.alpha * (input * self.kp - self.previous_output )) >> FIX_KOMMA_SHIFT_BITS;
+        let out = self.previous_output + (self.alpha * (input * self.kp - self.previous_output))
+            >> FIX_KOMMA_SHIFT_BITS;
         self.previous_output = out;
         out >> FIX_KOMMA_SHIFT_BITS
     }
@@ -46,13 +46,12 @@ impl PT1<f64> {
         assert!(kp < 1000.0);
         PT1::<f64> {
             kp: kp as f64,
-            alpha: (sample_time / t1_time ) as f64,
+            alpha: (sample_time / t1_time) as f64,
             previous_output: 0.,
         }
     }
     pub fn transfer(&mut self, input: f64) -> f64 {
-        let out = self.previous_output
-            + (self.alpha * (input * self.kp - self.previous_output )) ;
+        let out = self.previous_output + (self.alpha * (input * self.kp - self.previous_output));
         self.previous_output = out;
         out
     }
@@ -65,17 +64,20 @@ mod tests {
 
     #[test]
     fn test_PT1_new() {
-        assert_eq!( -2048 >> FIX_KOMMA_SHIFT_BITS, -2 );
-        assert_eq!( PT1::<i32> {
-            kp: 2048,
-            alpha: 512,
-            previous_output: 0,
-        }, PT1::<i32>::new(0.4, 0.4, 2.0) );
+        assert_eq!(-2048 >> FIX_KOMMA_SHIFT_BITS, -2);
+        assert_eq!(
+            PT1::<i32> {
+                kp: 2048,
+                alpha: 512,
+                previous_output: 0,
+            },
+            PT1::<i32>::new(0.4, 0.4, 2.0)
+        );
     }
 
     #[test]
     fn test_PT1_transfer() {
         let mut sut = PT1::<i32>::new(0.4, 0.4, 2.0);
-        assert_eq!( 1000, sut.transfer(1000));
+        assert_eq!(1000, sut.transfer(1000));
     }
 }
