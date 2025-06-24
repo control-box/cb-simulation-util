@@ -9,7 +9,7 @@
 //! fn main () {
 //!   let range = TimeRange::default().set_start(-5.0).set_end(15.0).set_number_of_samples(Some(10));
 //!   assert_eq!(range.len(), 10);
-//!   let time: Array<f32, Ix1> = range.collect();
+//!   let time: Array<f64, Ix1> = range.collect();
 //! }
 //! ```
 
@@ -19,10 +19,10 @@ use core::option::Option;
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct TimeRange {
     pub unit_of_measurement: &'static str,
-    pub start: f32,
-    pub end: f32,
-    pub sampling_interval: f32,
-    current: f32,
+    pub start: f64,
+    pub end: f64,
+    pub sampling_interval: f64,
+    current: f64,
 }
 
 const DEFAULT_SAMPLES: usize = 100;
@@ -47,7 +47,7 @@ impl TimeRange {
         }
     }
 
-    pub fn set_start(self, start: f32) -> Self {
+    pub fn set_start(self, start: f64) -> Self {
         if start > self.end {
             panic!("Start must be less than end")
         }
@@ -58,7 +58,7 @@ impl TimeRange {
         }
     }
 
-    pub fn set_end(self, end: f32) -> Self {
+    pub fn set_end(self, end: f64) -> Self {
         if self.start > end {
             panic!("Start must be less than end")
         }
@@ -73,14 +73,14 @@ impl TimeRange {
             None => DEFAULT_SAMPLES,
             Some(s) => s,
         };
-        let sampling_interval = (self.end - self.start) / samples as f32;
+        let sampling_interval = (self.end - self.start) / samples as f64;
         TimeRange {
             sampling_interval,
             ..self
         }
     }
 
-    pub fn set_sampling_interval(self, sampling_interval: f32) -> Self {
+    pub fn set_sampling_interval(self, sampling_interval: f64) -> Self {
         if self.end - self.start < sampling_interval {
             panic!("Sampling interval too small")
         }
@@ -93,7 +93,7 @@ impl TimeRange {
 }
 
 impl Iterator for TimeRange {
-    type Item = f32;
+    type Item = f64;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.current > self.end { return None; }

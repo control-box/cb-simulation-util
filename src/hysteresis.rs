@@ -48,13 +48,13 @@ impl<N: Num + Copy + Clone + PartialOrd> TransferFunction<N> for Hysteresis<N> {
 /// use control_box::hysteresis::{HysteresisBuilder, LinearFn};
 ///
 /// fn main() {
-///     let _h= HysteresisBuilder::<f32>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
+///     let _h= HysteresisBuilder::<f64>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
 ///         .lower_x(0.5).upper_x(1.0).build();
-///     let _h = HysteresisBuilder::<f32>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
+///     let _h = HysteresisBuilder::<f64>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
 ///         .lower_y(0.5).spread_x(1.0).build();
-///     let _h = HysteresisBuilder::<f32>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
+///     let _h = HysteresisBuilder::<f64>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
 ///         .upper_x(0.5).spread_y(1.0).upper_direction().build();
-///     let _h = HysteresisBuilder::<f32>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
+///     let _h = HysteresisBuilder::<f64>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})
 ///         .cross().spread_y(1.0).upper_direction().build();
 /// }
 ///
@@ -182,7 +182,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .build();
         assert_eq!(expected, sut)
     }
@@ -197,7 +197,7 @@ mod tests {
             direction: Direction::FromUpper,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .upper_direction()
                 .build();
         assert_eq!(expected, sut)
@@ -213,7 +213,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 1.0, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_x(1.0)
                 .build();
         assert_eq!(expected, sut)
@@ -229,7 +229,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_y(1.0)
                 .build();
         assert_eq!(expected, sut)
@@ -245,7 +245,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .cross()
                 .build();
         assert_eq!(expected, sut)
@@ -261,7 +261,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_x(1.0)
                 .lower_x(1.0)
                 .build();
@@ -278,7 +278,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_x(1.0)
                 .upper_x(1.0)
                 .build();
@@ -295,7 +295,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_x(1.0)
                 .lower_y(1.0)
                 .build();
@@ -312,7 +312,7 @@ mod tests {
             direction: Direction::FromLower,
         };
         let sut =
-            HysteresisBuilder::<f32>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
+            HysteresisBuilder::<f64>::new(LinearFn { m: 0.5, n: 0.0 }, LinearFn { m: 1.0, n: 1.0 })
                 .spread_x(1.0)
                 .upper_y(1.0)
                 .build();

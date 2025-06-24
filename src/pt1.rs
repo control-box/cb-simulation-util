@@ -18,14 +18,14 @@ const FIX_KOMMA_SHIFT: i32 = 1 << FIX_KOMMA_SHIFT_BITS;
 
 impl PT1<i32> {
     ///
-    pub fn new(sample_time: f32, t1_time: f32, kp: f32) -> Self {
+    pub fn new(sample_time: f64, t1_time: f64, kp: f64) -> Self {
         assert!(sample_time > 0.0);
         assert!(t1_time >= sample_time);
         assert!(kp > 0.0);
         assert!(kp < 1000.0);
         PT1::<i32> {
-            kp: (kp * FIX_KOMMA_SHIFT as f32) as i32,
-            alpha: (t1_time * FIX_KOMMA_SHIFT as f32 / (t1_time + sample_time)) as i32,
+            kp: (kp * FIX_KOMMA_SHIFT as f64) as i32,
+            alpha: (t1_time * FIX_KOMMA_SHIFT as f64 / (t1_time + sample_time)) as i32,
             previous_output: 0,
         }
     }
@@ -39,7 +39,7 @@ impl PT1<i32> {
 
 impl PT1<f64> {
     ///
-    pub fn new(sample_time: f32, t1_time: f32, kp: f32) -> Self {
+    pub fn new(sample_time: f64, t1_time: f64, kp: f64) -> Self {
         assert!(sample_time > 0.0);
         assert!(t1_time >= sample_time);
         assert!(kp > 0.0);
