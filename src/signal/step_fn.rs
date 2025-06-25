@@ -75,6 +75,6 @@ impl<S:  Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for Ste
     }
 }
 
-impl<S: Num +  Num +  Debug + Display + Clone + Copy + PartialEq> TimeSignalSuperTrait<S> for StepFunction<S> {}
+impl<S: Num +  Debug + Display + Clone + Copy + PartialEq> TimeSignalSuperTrait<S> for StepFunction<S> {}
 
 
