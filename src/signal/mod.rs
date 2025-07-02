@@ -22,19 +22,28 @@ use core::ops::Add;
 use core::fmt;
 use core::fmt::Debug;
 use core::fmt::Display;
+use dyn_clone::DynClone;  //  DynClone is a trait with clones a Box
 
 
 use std::{boxed::Box, borrow::ToOwned,string::String};
 
 
-pub trait TimeSignal<S: Debug + Display> {
+pub trait TimeSignal<S: Debug + Display + Clone + Sized> {
 
     fn time_to_signal(&self, time: f64 ) -> S;
 
 }
 
-pub trait TimeSignalSuperTrait<S: Debug + Display>:  TimeSignal<S> + Debug + Display
+pub trait TimeSignalSuperTrait<S: Debug + Display + Clone + Sized>:  TimeSignal<S> + Debug + Display + DynClone
 {}
+
+
+impl <S> Clone for Box<dyn TimeSignalSuperTrait<S>> {
+    fn clone(&self) -> Self {
+        dyn_clone::clone_box(&**self)
+    }
+}
+
 
 pub mod step_fn;
 pub use step_fn::*;
@@ -43,7 +52,7 @@ pub mod time_range;
 #[allow(unused_imports)]
 pub use time_range::*;
 
-#[derive(Debug )]
+#[derive(Debug, Clone )]
 pub struct SuperPosition<S: Num +  Debug + Display + Clone + PartialEq> ( pub Box<dyn TimeSignalSuperTrait<S>>, pub Box<dyn TimeSignalSuperTrait<S>>);
 
 impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for SuperPosition<S> {
@@ -60,10 +69,10 @@ impl <S: Add<Output = S> +  Num +  Debug + Display + Clone + Copy + PartialEq> T
 }
 
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct NamedTimeSignal<S: Num +  Debug + Display + Clone + Copy + PartialEq>  {
-    name: String,
-    signal: Box<dyn TimeSignalSuperTrait<S> + 'static>,
+    pub name: String,
+    pub signal: Box<dyn TimeSignalSuperTrait<S> + 'static>,
 }
 
 impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> Default for NamedTimeSignal<S> {
@@ -81,3 +90,10 @@ impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for Named
     }
 }
 
+
+impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> PartialEq for NamedTimeSignal<S>  {
+
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
