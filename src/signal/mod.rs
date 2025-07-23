@@ -75,6 +75,12 @@ pub struct NamedTimeSignal<S: Num +  Debug + Display + Clone + Copy + PartialEq>
     pub signal: Box<dyn TimeSignalSuperTrait<S> + 'static>,
 }
 
+impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> PartialEq for NamedTimeSignal<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.name == other.name
+    }
+}
+
 impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> Default for NamedTimeSignal<S> {
     fn default() -> Self {
         NamedTimeSignal {
@@ -87,13 +93,5 @@ impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> Default for N
 impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for NamedTimeSignal<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Time Signal: {} = {}", self.name, self.signal)
-    }
-}
-
-
-impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> PartialEq for NamedTimeSignal<S>  {
-
-    fn eq(&self, other: &Self) -> bool {
-        self.name == other.name
     }
 }
