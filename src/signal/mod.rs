@@ -17,71 +17,89 @@
 //! }
 //! ```
 
-use num_traits::Num;
-use core::ops::Add;
+use core::any::Any;
 use core::fmt;
 use core::fmt::Debug;
 use core::fmt::Display;
-use dyn_clone::DynClone;  //  DynClone is a trait with clones a Box
+use core::ops::Add;
+use dyn_clone::DynClone; // DynClone is a trait with clones a Box
+use num_traits::Num;
 
+use std::{borrow::ToOwned, boxed::Box, string::String};
 
-use std::{boxed::Box, borrow::ToOwned,string::String};
-
-
-pub trait TimeSignal<S: Debug + Display + Clone + Sized> {
-
-    fn time_to_signal(&self, time: f64 ) -> S;
-
+pub trait TimeSignal<S: Debug + Display + Clone + Sized>: Any {
+    fn time_to_signal(&self, time: f64) -> S;
+    fn as_any(&self) -> &dyn Any;
 }
 
-pub trait TimeSignalSuperTrait<S: Debug + Display + Clone + Sized>:  TimeSignal<S> + Debug + Display + DynClone
-{}
+pub trait TimeSignalSuperTrait<S: Debug + Display + Clone + Sized>:
+    TimeSignal<S> + Debug + Display + DynClone + 'static
+{
+}
 
+pub type BoxedTimeSignal<S> = Box<dyn TimeSignalSuperTrait<S> + 'static>;
 
-impl <S> Clone for Box<dyn TimeSignalSuperTrait<S>> {
+impl<S> Clone for BoxedTimeSignal<S> {
     fn clone(&self) -> Self {
         dyn_clone::clone_box(&**self)
     }
 }
 
+impl<S: Debug + Display + Clone + Sized + 'static> PartialEq for BoxedTimeSignal<S> {
+    fn eq(&self, other: &Self) -> bool {
+        self.as_any().type_id() == other.as_any().type_id()
+    }
+}
 
+pub mod impulse_fn;
 pub mod step_fn;
+
+pub use impulse_fn::*;
 pub use step_fn::*;
 
 pub mod time_range;
 #[allow(unused_imports)]
 pub use time_range::*;
 
-#[derive(Debug, Clone )]
-pub struct SuperPosition<S: Num +  Debug + Display + Clone + PartialEq> ( pub Box<dyn TimeSignalSuperTrait<S>>, pub Box<dyn TimeSignalSuperTrait<S>>);
+#[derive(Debug, Clone)]
+pub struct SuperPosition<S: Num + Debug + Display + Clone + PartialEq>(
+    pub Box<dyn TimeSignalSuperTrait<S>>,
+    pub Box<dyn TimeSignalSuperTrait<S>>,
+);
 
-impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for SuperPosition<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for SuperPosition<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "SuperPosition({}, {})", self.0, self.1)
     }
 }
 
-impl <S: Add<Output = S> +  Num +  Debug + Display + Clone + Copy + PartialEq> TimeSignal<S> for SuperPosition<S>  {
-
-    fn time_to_signal(&self, time: f64 ) -> S {
+impl<S: Add<Output = S> + Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S>
+    for SuperPosition<S>
+{
+    fn time_to_signal(&self, time: f64) -> S {
         self.0.time_to_signal(time) + self.1.time_to_signal(time)
+    }
+
+    fn as_any(&self) -> &dyn Any {
+        self
     }
 }
 
-
 #[derive(Debug, Clone)]
-pub struct NamedTimeSignal<S: Num +  Debug + Display + Clone + Copy + PartialEq>  {
+pub struct NamedTimeSignal<S: Num + Debug + Display + Clone + Copy + PartialEq> {
     pub name: String,
     pub signal: Box<dyn TimeSignalSuperTrait<S> + 'static>,
 }
 
-impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> PartialEq for NamedTimeSignal<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq
+    for NamedTimeSignal<S>
+{
     fn eq(&self, other: &Self) -> bool {
         self.name == other.name
     }
 }
 
-impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> Default for NamedTimeSignal<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> Default for NamedTimeSignal<S> {
     fn default() -> Self {
         NamedTimeSignal {
             name: "Default Step Function".to_owned(),
@@ -90,7 +108,7 @@ impl<S:Num +  Debug + Display + Clone + Copy + PartialEq+ 'static> Default for N
     }
 }
 
-impl<S:Num +  Debug + Display + Clone + Copy + PartialEq> fmt::Display for NamedTimeSignal<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for NamedTimeSignal<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Time Signal: {} = {}", self.name, self.signal)
     }

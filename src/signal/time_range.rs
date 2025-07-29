@@ -34,7 +34,7 @@ impl Default for TimeRange {
             start: 0.0,
             end: 100.0,
             sampling_interval: 1.0,
-            current: 0.0
+            current: 0.0,
         }
     }
 }
@@ -62,10 +62,7 @@ impl TimeRange {
         if self.start > end {
             panic!("Start must be less than end")
         }
-        TimeRange {
-            end,
-            ..self
-        }
+        TimeRange { end, ..self }
     }
 
     pub fn set_number_of_samples(self, samples: Option<usize>) -> Self {
@@ -89,25 +86,24 @@ impl TimeRange {
             ..self
         }
     }
-
 }
 
 impl Iterator for TimeRange {
     type Item = f64;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.current > self.end { return None; }
+        if self.current > self.end {
+            return None;
+        }
         self.current += self.sampling_interval;
         Some(self.current)
     }
 }
 
 impl ExactSizeIterator for TimeRange {
-
     fn len(&self) -> usize {
         ((self.end - self.start) / self.sampling_interval) as usize
     }
-
 }
 
 #[cfg(test)]
