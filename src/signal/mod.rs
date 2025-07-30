@@ -88,7 +88,21 @@ impl<S: Add<Output = S> + Num + Debug + Display + Clone + Copy + PartialEq + 'st
 #[derive(Debug, Clone)]
 pub struct NamedTimeSignal<S: Num + Debug + Display + Clone + Copy + PartialEq> {
     pub name: String,
-    pub signal: Box<dyn TimeSignalSuperTrait<S> + 'static>,
+    pub signal:  BoxedTimeSignal<S>,
+}
+
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> NamedTimeSignal<S> {
+    pub fn set_name(self, name: String) -> Self {
+        NamedTimeSignal {
+            name,
+            ..self }
+        }
+
+    pub fn set_signal(self, signal:  BoxedTimeSignal<S>) -> Self {
+        NamedTimeSignal {
+            signal,
+            ..self }
+        }
 }
 
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq
@@ -102,7 +116,7 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> Default for NamedTimeSignal<S> {
     fn default() -> Self {
         NamedTimeSignal {
-            name: "Default Step Function".to_owned(),
+            name: "Signal".to_owned(),
             signal: Box::new(StepFunction::<S>::default()),
         }
     }

@@ -8,7 +8,7 @@
 //!
 //! fn main () {
 //!   let time: Array<f64, Ix1> = TimeRange::default().collect();
-//!   let step_fn = ImpulsFunction::default().pre(2.0).post(3.0).step(1.1);
+//!   let step_fn = ImpulsFunction::default().resting_level(2.0).amplitude(3.0).start(20.0);
 //!   let signal: Array<f64, Ix1> = time.iter().map(|v| step_fn.time_to_signal(*v)).collect();
 //!   assert_eq!(signal[0], 2.0);
 //!   assert_eq!(signal[20], 3.0);
@@ -60,10 +60,10 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
     for ImpulsFunction<S>
 {
     fn time_to_signal(&self, time: f64) -> S {
-        if self.start_time < time {
+        if time < self.start_time {
             self.out_value
         } else {
-            if self.start_time + self.duration > time {
+            if time > self.start_time + self.duration {
                 self.out_value
             } else {
                 self.in_value
@@ -89,4 +89,37 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for Impul
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignalSuperTrait<S>
     for ImpulsFunction<S>
 {
+}
+
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+
+    #[test]
+    fn test_impulse_build() {
+        let sut = ImpulsFunction::<f64>::default()
+            .resting_level(2.0)
+            .amplitude(3.0)
+            .start(1.0)
+            .duration(2.0);
+        let expected = ImpulsFunction::<f64> {
+            out_value: 2.0,
+            in_value: 3.0,
+            start_time: 1.0,
+            duration: 2.0,
+        };
+        assert_eq!(expected, sut)
+    }
+
+    #[test]
+    fn test_impulse_() {
+        let sut = ImpulsFunction::<f64>::default();
+        assert_eq!(sut.time_to_signal(-1.0), 0.0);
+        assert_eq!(sut.time_to_signal(0.0), 1.0);
+        assert_eq!(sut.time_to_signal(1.0), 1.0);
+        assert_eq!(sut.time_to_signal(2.0), 0.0);
+
+    }
 }
