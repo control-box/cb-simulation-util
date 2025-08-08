@@ -17,6 +17,7 @@
 
 use num_traits::{Num, one, zero};
 
+
 pub use super::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -61,9 +62,9 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
         }
     }
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
+    // fn as_any(&self) -> &dyn Any {
+    //     self
+    // }
 }
 
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for StepFunction<S> {
@@ -76,7 +77,7 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for StepF
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignalSuperTrait<S>
-    for StepFunction<S>
-{
-}
+// impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> DynTimeSignal<S>
+//     for StepFunction<S>
+// {
+// }

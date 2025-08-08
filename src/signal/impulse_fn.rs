@@ -71,9 +71,9 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
         }
     }
 
-    fn as_any(&self) -> &dyn Any {
-        self
-    }
+    // fn as_any(&self) -> &dyn Any {
+    //     self
+    // }
 }
 
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for ImpulseFunction<S> {
@@ -86,10 +86,10 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for Impul
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignalSuperTrait<S>
-    for ImpulseFunction<S>
-{
-}
+// impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> DynTimeSignal<S>
+//     for ImpulseFunction<S>
+// {
+// }
 
 
 #[cfg(test)]
