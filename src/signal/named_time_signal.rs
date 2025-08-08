@@ -26,25 +26,20 @@ use std::{borrow::ToOwned, boxed::Box, string::String};
 
 pub use super::*;
 
-
 #[derive(Debug, Clone)]
 pub struct NamedTimeSignal<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> {
     pub name: String,
-    pub signal:  BoxedTimeSignal<S>,
+    pub signal: BoxedTimeSignal<S>,
 }
 
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> NamedTimeSignal<S> {
     pub fn set_name(self, name: String) -> Self {
-        NamedTimeSignal {
-            name,
-            ..self }
-        }
+        NamedTimeSignal { name, ..self }
+    }
 
-    pub fn set_signal(self, signal:  BoxedTimeSignal<S>) -> Self {
-        NamedTimeSignal {
-            signal,
-            ..self }
-        }
+    pub fn set_signal(self, signal: BoxedTimeSignal<S>) -> Self {
+        NamedTimeSignal { signal, ..self }
+    }
 }
 
 impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq

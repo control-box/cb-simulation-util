@@ -27,8 +27,6 @@ use num_traits::Num;
 
 use std::boxed::Box;
 
-
-
 pub trait TimeSignal<S: Debug + Display + Clone + Sized>: Any {
     fn time_to_signal(&self, time: f64) -> S;
 }
@@ -50,8 +48,7 @@ where
         self
     }
 
-    fn as_dyn_time_signal(&self) -> &dyn DynTimeSignal<S>
-    {
+    fn as_dyn_time_signal(&self) -> &dyn DynTimeSignal<S> {
         self
     }
 
@@ -72,20 +69,19 @@ impl<S> Clone for BoxedTimeSignal<S> {
     }
 }
 
-impl<S: Debug + Display + Clone + Sized + 'static > PartialEq for BoxedTimeSignal<S> {
+impl<S: Debug + Display + Clone + Sized + 'static> PartialEq for BoxedTimeSignal<S> {
     fn eq(&self, other: &Self) -> bool {
         self.dyn_eq(other.clone().as_dyn_time_signal())
     }
 }
 
-
 pub mod impulse_fn;
-pub mod step_fn;
 pub mod named_time_signal;
+pub mod step_fn;
 
 pub use impulse_fn::*;
-pub use step_fn::*;
 pub use named_time_signal::*;
+pub use step_fn::*;
 
 pub mod time_range;
 #[allow(unused_imports)]

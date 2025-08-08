@@ -91,7 +91,6 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for Impul
 // {
 // }
 
-
 #[cfg(test)]
 mod tests {
 
@@ -120,6 +119,5 @@ mod tests {
         assert_eq!(sut.time_to_signal(0.0), 1.0);
         assert_eq!(sut.time_to_signal(1.0), 1.0);
         assert_eq!(sut.time_to_signal(2.0), 0.0);
-
     }
 }

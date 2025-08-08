@@ -17,7 +17,6 @@
 
 use num_traits::{Num, one, zero};
 
-
 pub use super::*;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
