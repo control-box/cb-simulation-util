@@ -36,8 +36,8 @@ pub trait TimeSignal<S: Debug + Display + Clone + Copy + Sized>: Any {
 
 }
 
-pub trait DynTimeSignal<S: Debug + Display + Clone + Copy + Sized>:
-    TimeSignal<S> + Debug + Display + DynClone + 'static
+pub trait DynTimeSignal<S: Debug + Display + Clone + Copy + Sized + Send + Sync>:
+    TimeSignal<S> + Debug + Display + DynClone + 'static + Send + Sync
 {
     fn as_any(&self) -> &dyn Any;
     fn as_dyn_time_signal(&self) -> &dyn DynTimeSignal<S>;
@@ -46,8 +46,8 @@ pub trait DynTimeSignal<S: Debug + Display + Clone + Copy + Sized>:
 
 impl<T, S> DynTimeSignal<S> for T
 where
-    T: TimeSignal<S> + Debug + Display + DynClone + Copy + 'static + PartialEq,
-    S: Debug + Display + Clone + Copy + Sized + 'static,
+    T: TimeSignal<S> + Debug + Display + DynClone + Copy + 'static + PartialEq + Send + Sync,
+    S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync,
 {
     fn as_any(&self) -> &dyn Any {
         self
@@ -76,7 +76,7 @@ impl<S> Clone for BoxedTimeSignal<S> {
 }
 
 
-impl<S: Debug + Display + Clone + Copy + Sized + 'static> PartialEq for BoxedTimeSignal<S> {
+impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialEq for BoxedTimeSignal<S> {
     fn eq(&self, other: &Self) -> bool {
         self.dyn_eq(other.clone().as_dyn_time_signal())
     }

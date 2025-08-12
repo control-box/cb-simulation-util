@@ -42,7 +42,7 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> NamedTimeSig
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static + Send + Sync> PartialEq
     for NamedTimeSignal<S>
 {
     fn eq(&self, other: &Self) -> bool {
@@ -50,7 +50,7 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> PartialEq
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> Default for NamedTimeSignal<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static + Send + Sync> Default for NamedTimeSignal<S> {
     fn default() -> Self {
         NamedTimeSignal {
             name: "Signal".to_owned(),
