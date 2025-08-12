@@ -61,22 +61,18 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
         }
     }
 
-    // fn as_any(&self) -> &dyn Any {
-    //     self
-    // }
+    fn short_type_name(&self) -> &'static str {
+        "Step"
+    }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for StepFunction<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display for StepFunction<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "Step(step_time={}, pre={}, post={}",
-            self.step_time, self.pre_value, self.post_value
+            "{}(step_time={}, pre={}, post={}",
+            self.short_type_name(), self.step_time, self.pre_value, self.post_value
         )
     }
 }
 
-// impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> DynTimeSignal<S>
-//     for StepFunction<S>
-// {
-// }

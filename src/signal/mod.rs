@@ -27,11 +27,16 @@ use num_traits::Num;
 
 use std::boxed::Box;
 
-pub trait TimeSignal<S: Debug + Display + Clone + Sized>: Any {
+pub trait TimeSignal<S: Debug + Display + Clone + Copy + Sized>: Any {
+    /// Mapping from time to signal
     fn time_to_signal(&self, time: f64) -> S;
+    /// Treated as a "dynamic type identifier"
+    /// It should be one word starting with a capital letter
+    fn short_type_name(&self) -> &'static str;
+
 }
 
-pub trait DynTimeSignal<S: Debug + Display + Clone + Sized>:
+pub trait DynTimeSignal<S: Debug + Display + Clone + Copy + Sized>:
     TimeSignal<S> + Debug + Display + DynClone + 'static
 {
     fn as_any(&self) -> &dyn Any;
@@ -41,8 +46,8 @@ pub trait DynTimeSignal<S: Debug + Display + Clone + Sized>:
 
 impl<T, S> DynTimeSignal<S> for T
 where
-    T: TimeSignal<S> + Debug + Display + DynClone + 'static + PartialEq,
-    S: Debug + Display + Clone + Sized + 'static,
+    T: TimeSignal<S> + Debug + Display + DynClone + Copy + 'static + PartialEq,
+    S: Debug + Display + Clone + Copy + Sized + 'static,
 {
     fn as_any(&self) -> &dyn Any {
         self
@@ -61,6 +66,7 @@ where
     }
 }
 
+
 pub type BoxedTimeSignal<S> = Box<dyn DynTimeSignal<S> + 'static>;
 
 impl<S> Clone for BoxedTimeSignal<S> {
@@ -69,7 +75,8 @@ impl<S> Clone for BoxedTimeSignal<S> {
     }
 }
 
-impl<S: Debug + Display + Clone + Sized + 'static> PartialEq for BoxedTimeSignal<S> {
+
+impl<S: Debug + Display + Clone + Copy + Sized + 'static> PartialEq for BoxedTimeSignal<S> {
     fn eq(&self, other: &Self) -> bool {
         self.dyn_eq(other.clone().as_dyn_time_signal())
     }
@@ -93,9 +100,9 @@ pub struct SuperPosition<S: Num + Debug + Display + Clone + PartialEq>(
     pub Box<dyn DynTimeSignal<S>>,
 );
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq> fmt::Display for SuperPosition<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display for SuperPosition<S> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "SuperPosition({}, {})", self.0, self.1)
+        write!(f, "{}({}, {})", self.short_type_name(), self.0, self.1)
     }
 }
 
@@ -106,7 +113,7 @@ impl<S: Add<Output = S> + Num + Debug + Display + Clone + Copy + PartialEq + 'st
         self.0.time_to_signal(time) + self.1.time_to_signal(time)
     }
 
-    // fn as_any(&self) -> &dyn Any {
-    //     self
-    // }
+    fn short_type_name(&self) -> &'static str {
+        "Superposition"
+    }
 }
