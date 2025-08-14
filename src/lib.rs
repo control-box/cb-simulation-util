@@ -4,7 +4,8 @@
 extern crate std;
 
 pub mod hysteresis;
-pub mod pt1;
+#[cfg(feature = "std")]
+pub mod plant;
 
 #[cfg(feature = "std")]
 pub mod signal;
