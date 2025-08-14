@@ -33,7 +33,6 @@ pub trait TimeSignal<S: Debug + Display + Clone + Copy + Sized>: Any {
     /// Treated as a "dynamic type identifier"
     /// It should be one word starting with a capital letter
     fn short_type_name(&self) -> &'static str;
-
 }
 
 pub trait DynTimeSignal<S: Debug + Display + Clone + Copy + Sized + Send + Sync>:
@@ -66,7 +65,6 @@ where
     }
 }
 
-
 pub type BoxedTimeSignal<S> = Box<dyn DynTimeSignal<S> + 'static>;
 
 impl<S> Clone for BoxedTimeSignal<S> {
@@ -75,8 +73,9 @@ impl<S> Clone for BoxedTimeSignal<S> {
     }
 }
 
-
-impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialEq for BoxedTimeSignal<S> {
+impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialEq
+    for BoxedTimeSignal<S>
+{
     fn eq(&self, other: &Self) -> bool {
         self.dyn_eq(other.clone().as_dyn_time_signal())
     }
@@ -100,7 +99,9 @@ pub struct SuperPosition<S: Num + Debug + Display + Clone + PartialEq>(
     pub Box<dyn DynTimeSignal<S>>,
 );
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display for SuperPosition<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display
+    for SuperPosition<S>
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "{}({}, {})", self.short_type_name(), self.0, self.1)
     }

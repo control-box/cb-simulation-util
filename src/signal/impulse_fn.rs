@@ -76,12 +76,18 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display for ImpulseFunction<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display
+    for ImpulseFunction<S>
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{}(amplitude={}, duration={}, start_time={}, rest_level={}",
-            self.short_type_name(),self.in_value, self.duration, self.start_time, self.out_value,
+            self.short_type_name(),
+            self.in_value,
+            self.duration,
+            self.start_time,
+            self.out_value,
         )
     }
 }

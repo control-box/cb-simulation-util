@@ -50,7 +50,9 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static + Send + Sync
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static + Send + Sync> Default for NamedTimeSignal<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static + Send + Sync> Default
+    for NamedTimeSignal<S>
+{
     fn default() -> Self {
         NamedTimeSignal {
             name: "Signal".to_owned(),

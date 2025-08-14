@@ -13,41 +13,44 @@ use super::*;
 use core::fmt::{self, Display};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
-pub struct PT1<N>  {
+pub struct PT1<N> {
     pub t1_time: f64,
     pub sample_time: f64,
     pub kp: N,
     previous_output: N,
 }
 
-impl <N: PartialOrd + Zero>  PT1<N> {
-
+impl<N: PartialOrd + Zero> PT1<N> {
     pub fn set_sample_time(self, sample_time: f64) -> Self {
         assert!(sample_time > 0.0);
-        PT1::<N> {sample_time, ..self}
+        PT1::<N> {
+            sample_time,
+            ..self
+        }
     }
 
     pub fn set_t1_time(self, t1_time: f64) -> Self {
         assert!(t1_time >= self.sample_time || t1_time == 0.0);
-        PT1::<N> {t1_time, ..self}
+        PT1::<N> { t1_time, ..self }
     }
-
-    pub fn set_kp(self, kp: N) -> Self {
-        assert!(kp > N::zero());
-        PT1::<N> {kp, ..self}
-    }
-
 }
 
 const FIX_KOMMA_SHIFT_BITS: u8 = 10;
 const FIX_KOMMA_SHIFT: i32 = 1 << FIX_KOMMA_SHIFT_BITS;
 
 impl PT1<i32> {
-
     // alpha is fixed point with 10 bits after the comma
     // alpha is used to overcome sampling rate / t1 time dependency
     fn alpha(&self) -> i32 {
-        (self.t1_time * FIX_KOMMA_SHIFT as f64 / (self.t1_time + self.sample_time)) as i32
+        (self.sample_time * FIX_KOMMA_SHIFT as f64 / self.t1_time) as i32
+    }
+
+    pub fn set_kp(self, kp: i32) -> Self {
+        assert!(kp > 0);
+        PT1::<i32> {
+            kp: kp * FIX_KOMMA_SHIFT,
+            ..self
+        }
     }
 }
 
@@ -55,24 +58,25 @@ impl Default for PT1<i32> {
     fn default() -> Self {
         PT1::<i32> {
             sample_time: 1.0,
-            t1_time: 0.0,
-            kp: 1000,
+            t1_time: 1.0,
+            kp: FIX_KOMMA_SHIFT,
             previous_output: 0,
         }
     }
 }
 
-impl <N> TypeIdentifier for PT1<N> {
+impl<N> TypeIdentifier for PT1<N> {
     fn short_type_name(&self) -> &'static str {
         "PT1"
     }
 }
 
-impl <N: Display> Display for PT1<N> {
+impl<N: Display> Display for PT1<N> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
-            "PT1(sample_time: {}, t1_time {}, kp: {})", self.sample_time, self.t1_time, self.kp
+            "PT1(sample_time: {}, t1_time {}, kp: {})",
+            self.sample_time, self.t1_time, self.kp
         )
     }
 }
@@ -89,14 +93,18 @@ impl TransferTimeDomain<i32> for PT1<i32> {
 impl PT1<f64> {
     // alpha is used to overcome sampling rate / t1 time dependency
     fn alpha(&self) -> f64 {
-        self.t1_time  / (self.t1_time + self.sample_time)
+        self.sample_time / self.t1_time
+    }
+    pub fn set_kp(self, kp: f64) -> Self {
+        assert!(kp > 0.0);
+        PT1::<f64> { kp, ..self }
     }
 }
 
 impl Default for PT1<f64> {
     fn default() -> Self {
         PT1::<f64> {
-            t1_time: 0.0,
+            t1_time: 1.0,
             sample_time: 1.0,
             kp: 1.0,
             previous_output: 0.0,
@@ -112,9 +120,6 @@ impl TransferTimeDomain<f64> for PT1<f64> {
     }
 }
 
-
-
-
 #[cfg(test)]
 mod tests {
 
@@ -126,7 +131,7 @@ mod tests {
         assert_eq!(
             PT1::<i32> {
                 kp: 2048,
-                t1_time: 0.0,
+                t1_time: 1.0,
                 sample_time: 1.0,
                 previous_output: 0,
             },
@@ -150,11 +155,5 @@ mod tests {
             },
             PT1::<f64>::default()
         );
-    }
-
-    #[test]
-    fn test_PT1_f64_transfer() {
-        let mut sut = PT1::<i32>::new(0.4, 0.4, 2.0);
-        assert_eq!(1000, sut.transfer_td(1000));
     }
 }

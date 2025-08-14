@@ -66,13 +66,17 @@ impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> TimeSignal<S
     }
 }
 
-impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display for StepFunction<S> {
+impl<S: Num + Debug + Display + Clone + Copy + PartialEq + 'static> fmt::Display
+    for StepFunction<S>
+{
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(
             f,
             "{}(step_time={}, pre={}, post={}",
-            self.short_type_name(), self.step_time, self.pre_value, self.post_value
+            self.short_type_name(),
+            self.step_time,
+            self.pre_value,
+            self.post_value
         )
     }
 }
-

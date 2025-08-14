@@ -3,12 +3,10 @@ use core::any::Any;
 use core::fmt::Debug;
 use core::fmt::Display;
 
-
 use dyn_clone::DynClone; // DynClone is a trait with clones a Box
 use std::boxed::Box;
 
 pub mod pt1;
-
 
 pub trait TypeIdentifier {
     /// Treated as a "dynamic type identifier"
@@ -16,7 +14,7 @@ pub trait TypeIdentifier {
     fn short_type_name(&self) -> &'static str;
 }
 
-pub trait TransferTimeDomain<N> : TypeIdentifier {
+pub trait TransferTimeDomain<N>: TypeIdentifier {
     /// Transfer function for time domain
     ///
     /// # Arguments
@@ -36,7 +34,6 @@ pub trait TransferTimeDomain<N> : TypeIdentifier {
     fn transfer_td(&mut self, u: N) -> N;
 }
 
-
 pub trait DynTransferTimeDomain<S: Debug + Display + Clone + Copy + Sized + Send + Sync>:
     TransferTimeDomain<S> + Debug + Display + DynClone + 'static + Send + Sync
 {
@@ -47,7 +44,15 @@ pub trait DynTransferTimeDomain<S: Debug + Display + Clone + Copy + Sized + Send
 
 impl<T, S> DynTransferTimeDomain<S> for T
 where
-    T: TransferTimeDomain<S> + Debug + Display + DynClone + Copy + 'static + PartialEq + Send + Sync,
+    T: TransferTimeDomain<S>
+        + Debug
+        + Display
+        + DynClone
+        + Copy
+        + 'static
+        + PartialEq
+        + Send
+        + Sync,
     S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync,
 {
     fn as_any(&self) -> &dyn Any {
@@ -67,7 +72,6 @@ where
     }
 }
 
-
 pub type BoxedTransferTimeDomain<S> = Box<dyn DynTransferTimeDomain<S> + 'static>;
 
 impl<S> Clone for BoxedTransferTimeDomain<S> {
@@ -76,8 +80,9 @@ impl<S> Clone for BoxedTransferTimeDomain<S> {
     }
 }
 
-
-impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialEq for BoxedTransferTimeDomain<S> {
+impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialEq
+    for BoxedTransferTimeDomain<S>
+{
     fn eq(&self, other: &Self) -> bool {
         self.dyn_eq(other.clone().as_dyn_element())
     }
@@ -88,4 +93,3 @@ impl Default for BoxedTransferTimeDomain<f64> {
         Box::new(pt1::PT1::<f64>::default())
     }
 }
-
