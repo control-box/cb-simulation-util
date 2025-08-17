@@ -45,7 +45,7 @@ impl<N: Num + Copy + Clone + PartialOrd> TransferFunction<N> for Hysteresis<N> {
 ///
 /// # Examples
 /// ```
-/// use control_box::hysteresis::{HysteresisBuilder, LinearFn};
+/// use cb_simulation_util::hysteresis::{HysteresisBuilder, LinearFn};
 ///
 /// fn main() {
 ///     let _h= HysteresisBuilder::<f64>::new( LinearFn{ m: 1.0, n: 0.0},  LinearFn{ m: 1.0, n: 0.0})

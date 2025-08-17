@@ -15,7 +15,7 @@ Core Rust library for modeling and simulating control system signals.
 Add to your workspace and use the signal types:
 
 ```rust
-use control_box::signal::{StepSignal, Signal};
+use cb_simulation_util::signal::{StepSignal, Signal};
 
 let step = StepSignal::new(1.0, 0.0);
 let value = step.value_at(0.5);
@@ -30,6 +30,8 @@ let value = step.value_at(0.5);
 ## Development
 
 - Add new signal types in `src/signal/`
+- Add new element types in `src/plant/`
+- ci only checks for code sanity (build, test, doc/doc-test)
 
 ## License
 

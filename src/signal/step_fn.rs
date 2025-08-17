@@ -4,7 +4,7 @@
 //!
 //! ```rust
 //! use ndarray::{Array, Ix1};
-//! use control_box::signal::{TimeRange, StepFunction, TimeSignal};
+//! use cb_simulation_util::signal::{TimeRange, StepFunction, TimeSignal};
 //!
 //! fn main () {
 //!   let time: Array<f64, Ix1> = TimeRange::default().collect();
