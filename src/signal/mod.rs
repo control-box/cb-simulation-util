@@ -1,21 +1,8 @@
-//! # Time Range
+//! # Time Signals
 //!
-//! ## Example
-//!
-//! ```rust
-//! use ndarray::{Array, Ix1};
-//! use control_box::signal::{TimeRange, StepFunction, TimeSignal, SuperPosition};
-//!
-//! fn main () {
-//!   let time: Array<f64, Ix1> = TimeRange::default().collect();
-//!
-//!   let step_fn_0 = StepFunction::<f64>::default();
-//!   let step_fn_1 = StepFunction::<f64>::default().pre(0.0).post(-1.0).step(1.0);
-//!   let super_position = SuperPosition::<f64>(Box::new(step_fn_0), Box::new(step_fn_1));
-//!
-//!   let signal: Array<f64, Ix1> = time.iter().map(|v| super_position.time_to_signal(*v)).collect();
-//! }
+//!! This module provides the definition of time signals and their superposition.
 //! ```
+
 
 use core::any::Any;
 use core::fmt;
@@ -24,6 +11,14 @@ use core::fmt::Display;
 use core::ops::Add;
 use dyn_clone::DynClone; // DynClone is a trait with clones a Box
 use num_traits::Num;
+
+pub mod impulse_fn;
+pub mod step_fn;
+
+pub use impulse_fn::*;
+pub use step_fn::*;
+
+pub mod time_range;
 
 use std::boxed::Box;
 
@@ -81,15 +76,7 @@ impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialE
     }
 }
 
-pub mod impulse_fn;
-pub mod named_time_signal;
-pub mod step_fn;
 
-pub use impulse_fn::*;
-pub use named_time_signal::*;
-pub use step_fn::*;
-
-pub mod time_range;
 #[allow(unused_imports)]
 pub use time_range::*;
 

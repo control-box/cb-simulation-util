@@ -1,4 +1,4 @@
-//! # Time Range
+//! # Step - Time Signal
 //!
 //! ## Example
 //!

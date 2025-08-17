@@ -1,4 +1,4 @@
-//! # Time Range
+//! # Impulse - Time Signal
 //!
 //! ## Example
 //!
