@@ -23,15 +23,14 @@ let value = step.value_at(0.5);
 
 ## Project Structure
 
-- `src/signal/` — Signal trait and implementations
-- `src/pt1.rs` — PT1 element
+- `src/signal/` — Signal traits signals implementations
+- `src/plant/` — Element/plant traits and implementations
 - `src/hysteresis.rs` — Hysteresis model
 
 ## Development
 
 - Add new signal types in `src/signal/`
-- Extend PT1 or hysteresis models as needed
 
 ## License
 
-MIT
+MIT — see [`LICENSE.md`](LICENSE.md)
