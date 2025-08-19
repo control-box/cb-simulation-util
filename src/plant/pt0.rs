@@ -5,23 +5,26 @@
 //! and $T_{s}$ is the sample time constant
 //! amd $T_{0}$ is the time constant of the zero order lag
 //! and $P$ is the amplification
-
+//!
+//! For t_0 = 0 it is equivalent to a simple gain element.
 //!
 
 
 use super::*;
 use core::fmt::{self, Display};
 
-use std::vec;
-use std::vec::Vec;
-use num_traits::{Num, Zero, zero};
+use num_traits::{Num, Zero};
+ use std::ops::Shr;
 
-#[derive(Debug, Clone, PartialEq)]
+
+const MAX_BUFFER_SIZE: usize = 1000;
+
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub struct PT0<N> {
     pub t0_time: f64,
     pub sample_time: f64,
     pub kp: N,
-    buffered_output: Vec<N>,
+    buffered_output: [N; MAX_BUFFER_SIZE], // a fixed array meets the Copy trait requirements
 }
 
 impl<N: PartialOrd + Zero + Clone + Num> PT0<N> {
@@ -38,18 +41,60 @@ impl<N: PartialOrd + Zero + Clone + Num> PT0<N> {
         PT0::<N> { t0_time: t0_time + 1.0, ..self }
     }
 
-    pub fn build(self) -> Self {
-        // Adjust  buffered output
-        let buffer_size = (self.t0_time / self.sample_time) as usize;
 
-        PT0::<N> {
-            buffered_output: vec![N::zero(); buffer_size],
-            ..self
+}
+
+
+impl<N> TypeIdentifier for PT0<N> {
+    fn short_type_name(&self) -> &'static str {
+        "PT0"
+    }
+}
+
+impl<N: Display> Display for PT0<N> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(
+            f,
+            "PT0(sample_time: {}, t0_time {}, kp: {})",
+            self.sample_time, self.t0_time, self.kp
+        )
+    }
+}
+
+
+
+impl PT0<f64> {
+
+    pub fn set_kp(self, kp: f64) -> Self {
+        assert!(kp > 0.0);
+        PT0::<f64> { kp, ..self }
+    }
+}
+
+impl Default for PT0<f64> {
+    fn default() -> Self {
+        PT0::<f64> {
+            t0_time: 0.0,
+            sample_time: 1.0,
+            kp: 1.0,
+            buffered_output:  [0.0; MAX_BUFFER_SIZE],
         }
     }
+}
 
-    fn is_buffer_size_ok(&self) -> bool {
-        (self.t0_time / self.sample_time) as usize == self.buffered_output.len()
+impl TransferTimeDomain<f64> for PT0<f64> {
+    fn transfer_td(&mut self, input: f64) -> f64 {
+        let length = (self.t0_time / self.sample_time) as usize ;
+        assert!(length <= MAX_BUFFER_SIZE, "Buffer size exceeded");
+
+        for i in 0..length {
+            // Shift the buffer to the left
+            self.buffered_output[i] = self.buffered_output[i + 1];
+        }
+        // Add the new input to the end of the buffer
+        self.buffered_output[length] = input * self.kp;
+        // The output is the first element of the buffer
+        self.buffered_output[0]
     }
 }
 
@@ -72,71 +117,28 @@ impl Default for PT0<i32> {
             sample_time: 1.0,
             t0_time: 0.0,
             kp: FIX_KOMMA_SHIFT,
-            buffered_output: vec![zero(); 1],
+            buffered_output: [0; MAX_BUFFER_SIZE],
         }
     }
 }
 
-impl<N> TypeIdentifier for PT0<N> {
-    fn short_type_name(&self) -> &'static str {
-        "PT0"
-    }
-}
-
-impl<N: Display> Display for PT0<N> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(
-            f,
-            "PT0(sample_time: {}, t0_time {}, kp: {})",
-            self.sample_time, self.t0_time, self.kp
-        )
-    }
-}
 
 impl TransferTimeDomain<i32> for PT0<i32> {
     fn transfer_td(&mut self, input: i32) -> i32 {
-        assert!(self.is_buffer_size_ok(), "Build method must be called before transfer_td");
-        if self.buffered_output.len() > 0 {
+        let length = (self.t0_time / self.sample_time) as usize ;
+        assert!(length <= MAX_BUFFER_SIZE, "Buffer size exceeded");
+
+        for i in 0..length {
             // Shift the buffer to the left
-             self.buffered_output.remove(0);
+            self.buffered_output[i] = self.buffered_output[i + 1];
         }
-        self.buffered_output.push(input * self.kp);
+        // Add the new input to the end of the buffer
+        self.buffered_output[length] = input * self.kp;
         // The output is the first element of the buffer
         self.buffered_output[0] >> FIX_KOMMA_SHIFT_BITS
     }
 }
 
-impl PT0<f64> {
-
-    pub fn set_kp(self, kp: f64) -> Self {
-        assert!(kp > 0.0);
-        PT0::<f64> { kp, ..self }
-    }
-}
-
-impl Default for PT0<f64> {
-    fn default() -> Self {
-        PT0::<f64> {
-            t0_time: 0.0,
-            sample_time: 1.0,
-            kp: 1.0,
-            buffered_output: vec![zero(); 1],
-        }
-    }
-}
-
-impl TransferTimeDomain<f64> for PT0<f64> {
-    fn transfer_td(&mut self, input: f64) -> f64 {
-        assert!(self.is_buffer_size_ok(), "Build method must be called before transfer_td");
-        if self.buffered_output.len() > 0 {
-            // Shift the buffer to the left
-             self.buffered_output.remove(0);
-        }
-        self.buffered_output.push(input * self.kp);
-        // The output is the first element of the buffer
-        self.buffered_output[0]
-    }
-}
 
 #[cfg(test)]
 mod tests {
@@ -151,15 +153,25 @@ mod tests {
                 kp: 2048,
                 t0_time: 0.0,
                 sample_time: 1.0,
-                buffered_output: vec![zero(); 1],
+                buffered_output: [0; MAX_BUFFER_SIZE],
             },
             PT0::<i32>::default().set_kp(2)
         );
     }
 
     #[test]
-    fn test_PT0_i32_transfer() {
-        let mut sut = PT0::<i32>::default().set_t0_time(2.0).build();
+    fn test_PT0_i32_transfer_t0_is_null() {
+        let mut sut = PT0::<i32>::default();
+        assert_eq!(1000, sut.transfer_td(1000));
+    }
+    fn test_PT0_i32_transfer_t0_is_one() {
+        let mut sut = PT0::<i32>::default().set_t0_time(1.0);
+        assert_eq!(0, sut.transfer_td(100));
+        assert_eq!(100, sut.transfer_td(200));
+        assert_eq!(200, sut.transfer_td(300));
+    }
+    fn test_PT0_i32_transfer_t0_is_two() {
+        let mut sut = PT0::<i32>::default().set_t0_time(2.0);
         assert_eq!(0, sut.transfer_td(100));
         assert_eq!(0, sut.transfer_td(1000));
         assert_eq!(100, sut.transfer_td(2000));
@@ -173,7 +185,7 @@ mod tests {
                 kp: 1.0,
                 t0_time: 2.0,
                 sample_time: 1.0,
-                buffered_output: vec![zero(); 2],
+                buffered_output: [0.0; MAX_BUFFER_SIZE],
             },
             PT0::<f64>::default()
         );
