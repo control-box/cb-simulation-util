@@ -31,7 +31,7 @@ impl<N: PartialOrd + Zero> PT1<N> {
     }
 
     pub fn set_t1_time(self, t1_time: f64) -> Self {
-        assert!(t1_time >= self.sample_time || t1_time == 0.0);
+        assert!(t1_time >= self.sample_time);
         PT1::<N> { t1_time, ..self }
     }
 }
