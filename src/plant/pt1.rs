@@ -2,9 +2,10 @@
 //!
 //! $ out[k]= out[k-1]+ \alpha (P * in[k]-out[k-1]) $
 //!
-//! where $\alpha =\frac{T_{1}}{T_{1}+T_{s}}$
+//! where $\alpha =\frac{T_{s}}{T_{1}}$
 //! and $T_{s}$ is the sample time constant
 //! and $P$ is the amplification
+//! Euler forward method
 //!
 
 use num_traits::Zero;

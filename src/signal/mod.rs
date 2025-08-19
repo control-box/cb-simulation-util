@@ -3,7 +3,6 @@
 //!! This module provides the definition of time signals and their superposition.
 //! ```
 
-
 use core::any::Any;
 use core::fmt;
 use core::fmt::Debug;
@@ -75,7 +74,6 @@ impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialE
         self.dyn_eq(other.clone().as_dyn_time_signal())
     }
 }
-
 
 #[allow(unused_imports)]
 pub use time_range::*;

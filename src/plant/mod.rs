@@ -7,6 +7,7 @@ use dyn_clone::DynClone; // DynClone is a trait with clones a Box
 use std::boxed::Box;
 
 pub mod pt1;
+pub mod pt2;
 
 pub trait TypeIdentifier {
     /// Treated as a "dynamic type identifier"
