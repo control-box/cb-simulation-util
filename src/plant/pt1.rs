@@ -38,9 +38,12 @@ impl<N: PartialOrd + Zero> PT1<N> {
 
     pub fn set_t1_time_or_default(self, t1_time: f64) -> Self {
         if t1_time >= self.sample_time {
-            PT1::<N> { t1_time , ..self }
+            PT1::<N> { t1_time, ..self }
         } else {
-            PT1::<N> { t1_time: self.sample_time, ..self }
+            PT1::<N> {
+                t1_time: self.sample_time,
+                ..self
+            }
         }
     }
 }
@@ -129,11 +132,13 @@ impl TransferTimeDomain<f64> for PT1<f64> {
     }
 }
 
+#[allow(non_snake_case)]
 #[cfg(test)]
 mod tests {
 
     use super::*;
 
+    #[allow(dead_code)]
     #[test]
     fn test_PT1_new() {
         assert_eq!(-2048 >> FIX_KOMMA_SHIFT_BITS, -2);
@@ -154,11 +159,12 @@ mod tests {
         assert_eq!(1000, sut.transfer_td(1000));
     }
 
+    #[test]
     fn test_PT1_f64_default() {
         assert_eq!(
             PT1::<f64> {
                 kp: 1.0,
-                t1_time: 0.0,
+                t1_time: 1.0,
                 sample_time: 1.0,
                 previous_output: 0.0,
             },

@@ -73,7 +73,10 @@ impl<N: PartialOrd + Zero> PT2<N> {
         if damping >= 0.0 {
             PT2::<N> { damping, ..self }
         } else {
-            PT2::<N> { damping: 1.0, ..self }
+            PT2::<N> {
+                damping: 1.0,
+                ..self
+            }
         }
     }
 
@@ -83,7 +86,10 @@ impl<N: PartialOrd + Zero> PT2<N> {
     /// - is equivalent to set the period of angular frequency
     pub fn set_t1_time_or_default(self, t1_time: f64) -> Self {
         if t1_time >= self.sample_time {
-            PT2::<N> { omega: 1.0 / t1_time, ..self }
+            PT2::<N> {
+                omega: 1.0 / t1_time,
+                ..self
+            }
         } else {
             PT2::<N> { omega: 1.0, ..self }
         }
@@ -98,8 +104,9 @@ impl<N: PartialOrd + Zero> PT2<N> {
             let omega = (1.0 / t2_time * self.omega).sqrt();
             PT2::<N> {
                 omega,
-                damping : (1.0 / self.omega + t2_time) / (2.0 * self.omega),
-                ..self }
+                damping: (1.0 / self.omega + t2_time) / (2.0 * self.omega),
+                ..self
+            }
         } else {
             PT2::<N> {
                 damping: 1.0, // t1 == t2 equivalent to critically damped oscillation
@@ -203,13 +210,15 @@ impl TransferTimeDomain<f64> for PT2<f64> {
                     - omega_squared * self.previous_output
                     + self.kp * omega_squared * input);
         // $ x1[k] = x1​[k−1] + h omega ​x2​[k−1]
-        let output = self.previous_output + (self.sample_time * self.omega * self.previous_diff_output);
+        let output =
+            self.previous_output + (self.sample_time * self.omega * self.previous_diff_output);
         self.previous_diff_output = diff_output;
         self.previous_output = output;
         output
     }
 }
 
+#[allow(non_snake_case)]
 #[cfg(test)]
 mod tests {
 
@@ -237,11 +246,12 @@ mod tests {
         assert_eq!(0, sut.transfer_td(1000));
     }
 
+    #[test]
     fn test_PT2_f64_default() {
         assert_eq!(
             PT2::<f64> {
                 kp: 1.0,
-                omega: 0.0,
+                omega: 1.0,
                 sample_time: 1.0,
                 damping: 1.0,
                 previous_diff_output: 0.0,
