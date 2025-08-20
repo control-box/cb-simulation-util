@@ -22,17 +22,26 @@ pub struct PT1<N> {
 }
 
 impl<N: PartialOrd + Zero> PT1<N> {
-    pub fn set_sample_time(self, sample_time: f64) -> Self {
-        assert!(sample_time > 0.0);
-        PT1::<N> {
-            sample_time,
-            ..self
+    pub fn set_sample_time_or_default(self, sample_time: f64) -> Self {
+        if sample_time > 0.0 {
+            PT1::<N> {
+                sample_time,
+                ..self
+            }
+        } else {
+            PT1::<N> {
+                sample_time: 1.0,
+                ..self
+            }
         }
     }
 
-    pub fn set_t1_time(self, t1_time: f64) -> Self {
-        assert!(t1_time >= self.sample_time);
-        PT1::<N> { t1_time, ..self }
+    pub fn set_t1_time_or_default(self, t1_time: f64) -> Self {
+        if t1_time >= self.sample_time {
+            PT1::<N> { t1_time , ..self }
+        } else {
+            PT1::<N> { t1_time: self.sample_time, ..self }
+        }
     }
 }
 
@@ -47,7 +56,6 @@ impl PT1<i32> {
     }
 
     pub fn set_kp(self, kp: i32) -> Self {
-        assert!(kp > 0);
         PT1::<i32> {
             kp: kp * FIX_KOMMA_SHIFT,
             ..self

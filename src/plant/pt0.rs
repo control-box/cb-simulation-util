@@ -12,9 +12,10 @@
 
 use super::*;
 use core::fmt::{self, Display};
+use core::panic;
+
 
 use num_traits::{Num, Zero};
- use std::ops::Shr;
 
 
 const MAX_BUFFER_SIZE: usize = 1000;
@@ -28,19 +29,35 @@ pub struct PT0<N> {
 }
 
 impl<N: PartialOrd + Zero + Clone + Num> PT0<N> {
-    pub fn set_sample_time(self, sample_time: f64) -> Self {
-        assert!(sample_time > 0.0);
-        PT0::<N> {
-            sample_time,
-            ..self
+    pub fn set_sample_time_or_default(self, sample_time: f64) -> Self {
+        if sample_time > 0.0 {
+            PT0::<N> {
+                sample_time,
+                ..self
+            }
+        } else {
+            PT0::<N> {
+                sample_time: 1.0,
+                ..self
+            }
         }
     }
 
-    pub fn set_t0_time(self, t0_time: f64) -> Self {
-        assert!(t0_time >= 0.0);
-        PT0::<N> { t0_time: t0_time + 1.0, ..self }
+    pub fn set_t0_time(self, t0_time: f64) -> Result<Self, &'static str> {
+        if t0_time >= 0.0 {
+            Ok(PT0::<N> { t0_time: t0_time + 1.0, ..self })
+        } else {
+            Err("Invalid t0_time: Must be >= 0.0")
+        }
     }
 
+    pub fn set_t0_time_or_default(self, t0_time: f64) -> Self {
+        if t0_time >= 0.0 {
+            PT0::<N> { t0_time: t0_time + 1.0, ..self }
+        } else {
+            PT0::<N> { t0_time: 1.0, ..self }
+        }
+    }
 
 }
 
@@ -66,7 +83,6 @@ impl<N: Display> Display for PT0<N> {
 impl PT0<f64> {
 
     pub fn set_kp(self, kp: f64) -> Self {
-        assert!(kp > 0.0);
         PT0::<f64> { kp, ..self }
     }
 }
@@ -85,7 +101,9 @@ impl Default for PT0<f64> {
 impl TransferTimeDomain<f64> for PT0<f64> {
     fn transfer_td(&mut self, input: f64) -> f64 {
         let length = (self.t0_time / self.sample_time) as usize ;
-        assert!(length <= MAX_BUFFER_SIZE, "Buffer size exceeded");
+        if length > MAX_BUFFER_SIZE {
+            panic!("Panic: Buffer size exceeded at PT0 element with t0_time: {}", self.t0_time);
+        }
 
         for i in 0..length {
             // Shift the buffer to the left
@@ -126,7 +144,9 @@ impl Default for PT0<i32> {
 impl TransferTimeDomain<i32> for PT0<i32> {
     fn transfer_td(&mut self, input: i32) -> i32 {
         let length = (self.t0_time / self.sample_time) as usize ;
-        assert!(length <= MAX_BUFFER_SIZE, "Buffer size exceeded");
+        if length > MAX_BUFFER_SIZE {
+            panic!("Panic: Buffer size exceeded at PT0 element with t0_time: {}", self.t0_time);
+        }
 
         for i in 0..length {
             // Shift the buffer to the left
