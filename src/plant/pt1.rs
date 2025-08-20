@@ -104,8 +104,8 @@ impl PT1<f64> {
     fn alpha(&self) -> f64 {
         self.sample_time / self.t1_time
     }
+
     pub fn set_kp(self, kp: f64) -> Self {
-        assert!(kp > 0.0);
         PT1::<f64> { kp, ..self }
     }
 }

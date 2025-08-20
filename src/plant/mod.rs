@@ -92,6 +92,6 @@ impl<S: Debug + Display + Clone + Copy + Sized + 'static + Send + Sync> PartialE
 
 impl Default for BoxedTransferTimeDomain<f64> {
     fn default() -> Self {
-        Box::new(pt1::PT1::<f64>::default())
+        Box::new(pt0::PT0::<f64>::default())
     }
 }
